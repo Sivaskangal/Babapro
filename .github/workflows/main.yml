@@ -1,0 +1,25 @@
+name: Uzun SSH Erişimi (6 saat)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ssh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 saat
+
+    steps:
+      - name: SSH başlat (tmate kısa)
+        uses: mxschmitt/action-tmate@v3
+        with:
+          duration: 1  # 1 dakika (en kısa süre, step kısa tamamlanacak)
+      - name: Kısa bekleme
+        run: sleep 1  # 1 saniye sonra diğer adıma geç
+
+      - name: Kapanmayı engelle (sonsuz bekle)
+        run: |
+          echo "⏳ Sunucu açık, bağlantıyı SSH ile kurdun mu? Otomatik kapanmasın diye bekleniyor..."
+          while true; do
+            echo "⌛ Sunucu hala çalışıyor: $(date)"
+            sleep 60
+          done
