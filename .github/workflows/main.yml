@@ -1,4 +1,4 @@
-name: Uzun SSH Erişimi (6 saat)
+name: Tmate + tmux Stable SSH
 
 on:
   workflow_dispatch:
@@ -6,11 +6,31 @@ on:
 jobs:
   ssh:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 saat
+    timeout-minutes: 360
 
     steps:
-      - name: Tmate SSH başlat
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 360
-        with:
-          limit-access-to-actor: false
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmate tmux
+
+      - name: Start tmux session
+        run: |
+          tmux new-session -d -s main
+
+      - name: Start tmate inside tmux
+        run: |
+          tmux send-keys -t main "tmate -F" C-m
+
+      - name: Wait for SSH link
+        run: |
+          sleep 10
+          echo "===== TMATE SSH ====="
+          tmux capture-pane -t main -p | grep "ssh"
+
+      - name: Keep alive loop
+        run: |
+          while true; do
+            echo "[ALIVE] $(date)"
+            sleep 300
+          done
