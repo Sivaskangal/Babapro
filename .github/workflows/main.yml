@@ -1,4 +1,4 @@
-name: Tmate + tmux Stable SSH
+name: SSH
 
 on:
   workflow_dispatch:
@@ -9,28 +9,5 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tmate tmux
-
-      - name: Start tmux session
-        run: |
-          tmux new-session -d -s main
-
-      - name: Start tmate inside tmux
-        run: |
-          tmux send-keys -t main "tmate -F" C-m
-
-      - name: Wait for SSH link
-        run: |
-          sleep 10
-          echo "===== TMATE SSH ====="
-          tmux capture-pane -t main -p | grep "ssh"
-
-      - name: Keep alive loop
-        run: |
-          while true; do
-            echo "[ALIVE] $(date)"
-            sleep 300
-          done
+      - name: Start tmate
+        uses: mxschmitt/action-tmate@v3
